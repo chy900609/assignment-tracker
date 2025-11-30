@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"> <!-- 設定編碼 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- RWD -->
+  <title>作業進度追蹤器</title>
+  <link rel="stylesheet" href="style.css"> <!-- 載入CSS -->
+</head>
+<body>
+  <header class="app-header">
+    <h1>作業進度追蹤器</h1>
+    <p class="subtitle">用來記錄每一份作業的進度與截止日期</p>
+  </header>
+
+  <main class="app-main">
+    <section class="card">
+      <h2>新增作業</h2>
+      <form id="task-form" class="task-form">
+        <div class="form-row">
+          <label for="title">作業名稱</label>
+          <input id="title" name="title" type="text" placeholder="例如：DevOps 作業 9" required> <!-- 作業標題 -->
+        </div>
+        <div class="form-row">
+          <label for="course">課程名稱</label>
+          <input id="course" name="course" type="text" placeholder="例如：雲端運算 / 可靠度工程" required> <!-- 課程名稱 -->
+        </div>
+        <div class="form-row">
+          <label for="dueDate">截止日期</label>
+          <input id="dueDate" name="dueDate" type="date" required> <!-- 截止日 -->
+        </div>
+        <div class="form-row">
+          <label for="status">狀態</label>
+          <select id="status" name="status">
+            <option value="todo">待開始</option>
+            <option value="in-progress">進行中</option>
+            <option value="done">已完成</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">加入清單</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>作業清單</h2>
+        <div class="filters">
+          <label for="statusFilter">狀態篩選：</label>
+          <select id="statusFilter">
+            <option value="all">全部</option>
+            <option value="todo">待開始</option>
+            <option value="in-progress">進行中</option>
+            <option value="done">已完成</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th>作業名稱</th>
+              <th>課程</th>
+              <th>截止日期</th>
+              <th>狀態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="task-tbody">
+            <!-- 由 JavaScript 動態插入 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Created with Vibe Coding &amp; ChatGPT</p>
+  </footer>
+
+  <script src="main.js"></script> <!-- 載入JS -->
+</body>
+</html>
