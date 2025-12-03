@@ -1,105 +1,138 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8"> <!-- 編碼 -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- RWD -->
-  <title>作業進度追蹤器</title>
-  <link rel="stylesheet" href="style.css"> <!-- 載入CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作業進度追蹤器 Plus（含登入系統）</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="app-header">
     <h1>作業進度追蹤器 Plus</h1>
-    <p class="subtitle">記錄作業、追蹤進度</p>
+    <p class="subtitle">支援多帳號登入，作業資料存在後端 API</p>
   </header>
 
   <main class="app-main">
-    <!-- 新增 / 編輯作業 -->
-    <section class="card">
-      <h2 id="form-title">新增作業</h2>
-      <form id="task-form" class="task-form">
+    <!-- 🔐 登入 / 註冊區塊 -->
+    <section class="card" id="auth-section">
+      <h2>登入 / 註冊</h2>
+      <p class="hint-text">
+        本系統示範透過前端 + 後端 REST API 建立簡易登入功能。帳號與作業資料實際儲存在後端伺服器的記憶體中（作業 Demo 用，未接資料庫）。
+      </p>
+      <form id="auth-form" class="auth-form">
         <div class="form-row">
-          <label for="title">作業名稱</label>
-          <input id="title" name="title" type="text" placeholder="例如：可靠度工程作業 2" required> <!-- 作業名稱 -->
+          <label for="username">使用者帳號</label>
+          <input id="username" name="username" type="text" placeholder="例如：b10609101" required>
         </div>
         <div class="form-row">
-          <label for="course">課程名稱</label>
-          <input id="course" name="course" type="text" placeholder="例如：可靠度工程 / 物聯網應用" required> <!-- 課程名稱 -->
-        </div>
-        <div class="form-row">
-          <label for="dueDate">截止日期</label>
-          <input id="dueDate" name="dueDate" type="date" required> <!-- 截止日 -->
-        </div>
-        <div class="form-row">
-          <label for="status">狀態</label>
-          <select id="status" name="status">
-            <option value="todo">待開始</option>
-            <option value="in-progress">進行中</option>
-            <option value="done">已完成</option>
-          </select>
+          <label for="password">密碼</label>
+          <input id="password" name="password" type="password" placeholder="純作業示範用密碼" required>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn-primary" id="submit-btn">加入清單</button> <!-- 新增 / 更新 -->
-          <button type="button" class="btn-secondary hidden" id="cancel-edit-btn">取消編輯</button> <!-- 取消編輯 -->
+          <button type="button" class="btn-primary" id="login-btn">登入</button>
+          <button type="button" class="btn-secondary" id="register-btn">註冊新帳號</button>
         </div>
       </form>
     </section>
 
-    <!-- 統計 + 篩選 + 搜尋 + 排序 + 清單 -->
-    <section class="card">
-      <div class="card-header column-on-mobile">
-        <div>
-          <h2>作業總覽</h2>
-          <div id="stats" class="stats">
-            <!-- 由 JS 動態更新統計 -->
-            <span id="stat-total">總數：0</span>
-            <span id="stat-done">已完成：0</span>
-            <span id="stat-in-progress">進行中：0</span>
-            <span id="stat-todo">待開始：0</span>
-            <span id="stat-rate">完成率：0%</span>
-          </div>
+    <!-- ✅ 已登入後的主系統（作業管理） -->
+    <section id="app-section" class="hidden">
+      <!-- 顯示目前登入狀態 -->
+      <section class="card user-bar">
+        <div class="user-info">
+          <span id="current-user-label">目前未登入</span>
+          <span class="user-tip">（每個帳號的作業獨立儲存在後端）</span>
         </div>
-        <div class="controls">
-          <div class="control-group">
-            <label for="searchInput">搜尋：</label>
-            <input id="searchInput" type="text" placeholder="依作業名稱或課程關鍵字…"> <!-- 搜尋 -->
+        <button type="button" class="btn-secondary" id="logout-btn">登出</button>
+      </section>
+
+      <!-- 新增 / 編輯作業 -->
+      <section class="card">
+        <h2 id="form-title">新增作業</h2>
+        <form id="task-form" class="task-form">
+          <div class="form-row">
+            <label for="title">作業名稱</label>
+            <input id="title" name="title" type="text" placeholder="例如：可靠度工程作業 2" required>
           </div>
-          <div class="control-group">
-            <label for="statusFilter">狀態：</label>
-            <select id="statusFilter">
-              <option value="all">全部</option>
+          <div class="form-row">
+            <label for="course">課程名稱</label>
+            <input id="course" name="course" type="text" placeholder="例如：可靠度工程 / 物聯網應用" required>
+          </div>
+          <div class="form-row">
+            <label for="dueDate">截止日期</label>
+            <input id="dueDate" name="dueDate" type="date" required>
+          </div>
+          <div class="form-row">
+            <label for="status">狀態</label>
+            <select id="status" name="status">
               <option value="todo">待開始</option>
               <option value="in-progress">進行中</option>
               <option value="done">已完成</option>
             </select>
           </div>
-          <div class="control-group">
-            <label for="sortSelect">排序：</label>
-            <select id="sortSelect">
-              <option value="due-asc">截止日（舊 → 新）</option>
-              <option value="due-desc">截止日（新 → 舊）</option>
-              <option value="status">依狀態</option>
-            </select>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="submit-btn">加入清單</button>
+            <button type="button" class="btn-secondary hidden" id="cancel-edit-btn">取消編輯</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- 統計 + 篩選 + 搜尋 + 排序 + 清單 -->
+      <section class="card">
+        <div class="card-header column-on-mobile">
+          <div>
+            <h2>作業總覽</h2>
+            <div id="stats" class="stats">
+              <span id="stat-total">總數：0</span>
+              <span id="stat-done">已完成：0</span>
+              <span id="stat-in-progress">進行中：0</span>
+              <span id="stat-todo">待開始：0</span>
+              <span id="stat-rate">完成率：0%</span>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="control-group">
+              <label for="searchInput">搜尋：</label>
+              <input id="searchInput" type="text" placeholder="依作業名稱或課程關鍵字…">
+            </div>
+            <div class="control-group">
+              <label for="statusFilter">狀態：</label>
+              <select id="statusFilter">
+                <option value="all">全部</option>
+                <option value="todo">待開始</option>
+                <option value="in-progress">進行中</option>
+                <option value="done">已完成</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="sortSelect">排序：</label>
+              <select id="sortSelect">
+                <option value="due-asc">截止日（舊 → 新）</option>
+                <option value="due-desc">截止日（新 → 舊）</option>
+                <option value="status">依狀態</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="table-wrapper">
-        <table class="task-table">
-          <thead>
-            <tr>
-              <th>作業名稱</th>
-              <th>課程</th>
-              <th>截止日期</th>
-              <th>狀態</th>
-              <th>狀態說明</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="task-tbody">
-            <!-- 由 JavaScript 動態插入 -->
-          </tbody>
-        </table>
-      </div>
+        <div class="table-wrapper">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th>作業名稱</th>
+                <th>課程</th>
+                <th>截止日期</th>
+                <th>狀態</th>
+                <th>狀態說明</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="task-tbody">
+              <!-- 由 JavaScript 動態插入 -->
+            </tbody>
+          </table>
+        </div>
+      </section>
     </section>
   </main>
 
@@ -107,6 +140,6 @@
     <p>Created with Vibe Coding &amp; ChatGPT (GPT-5.1)</p>
   </footer>
 
-  <script src="main.js"></script> <!-- 載入JS -->
+  <script src="main.js"></script>
 </body>
 </html>
