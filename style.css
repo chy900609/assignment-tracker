@@ -1,3 +1,10 @@
+.task-table td:last-child {
+  min-width: 140px;
+}
+
+.actions {
+  justify-content: flex-start;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
