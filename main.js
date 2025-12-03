@@ -1,5 +1,5 @@
 // ====== 後端 API 基礎網址（務必改成你的實際 URL） ======
-const API_BASE = "https://chy900609-assignment-tracker-backend.onrender.com/"; // TODO: 換成自己的
+const API_BASE = "https://chy900609-assignment-tracker-backend.onrender.com/api"; // TODO: 換成自己的
 
 // ====== 狀態變數 ======
 let tasks = [];            // 目前登入使用者的作業
