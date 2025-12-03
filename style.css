@@ -65,6 +65,34 @@ body {
   margin-bottom: 12px;
 }
 
+/* ✅ 訊息框（登入/系統共用） */
+
+.message {
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  border: 1px solid transparent;
+}
+
+.message-info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.message-success {
+  background: #ecfdf3;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.message-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
 /* 登入表單 */
 
 .auth-form {

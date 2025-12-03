@@ -1,11 +1,11 @@
 // ====== 後端 API 基礎網址（務必改成你的實際 URL） ======
-const API_BASE = "https://chy900609-assignment-tracker-backend.onrender.com/api"; // TODO: 換成自己的
+const API_BASE = "https://chy900609-assignment-tracker-backend.onrender.com/api"; // ← 如果網址有變，調整這裡
 
 // ====== 狀態變數 ======
 let tasks = [];            // 目前登入使用者的作業
 let editingTaskId = null;  // 正在編輯哪一筆作業（id）
 let currentUser = null;    // 目前登入帳號
-let authToken = null;      // 後端回傳的 token（這裡就是 username）
+let authToken = null;      // 後端回傳的 token（這裡是 username）
 
 // ====== DOM 取得 ======
 
@@ -19,6 +19,10 @@ const logoutBtn = document.getElementById("logout-btn");
 const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const currentUserLabel = document.getElementById("current-user-label");
+
+// 新增：訊息顯示區
+const authMessageBox = document.getElementById("auth-message");
+const appMessageBox = document.getElementById("app-message");
 
 // 作業表單相關
 const taskForm = document.getElementById("task-form");
@@ -107,6 +111,53 @@ function updateStats() {
   statInProgress.textContent = `進行中：${inProgressCount}`;
   statTodo.textContent = `待開始：${todoCount}`;
   statRate.textContent = `完成率：${rate}%`;
+}
+
+// ✅ 新增：統一顯示訊息（scope: "auth" / "app"; type: "info" | "success" | "error"）
+function showMessage(scope, type, text) {
+  const box = scope === "auth" ? authMessageBox : appMessageBox;
+  if (!box) {
+    console.log(`[${scope}][${type}]`, text);
+    return;
+  }
+
+  if (!text) {
+    box.textContent = "";
+    box.className = "message hidden";
+    return;
+  }
+
+  box.textContent = text;
+  box.className = "message"; // 重置
+  if (type === "success") box.classList.add("message-success");
+  else if (type === "error") box.classList.add("message-error");
+  else box.classList.add("message-info");
+}
+
+// ✅ 新增：登入/註冊 Loading 狀態
+function setAuthLoading(isLoading) {
+  if (!loginBtn || !registerBtn) return;
+
+  loginBtn.disabled = isLoading;
+  registerBtn.disabled = isLoading;
+
+  if (isLoading) {
+    if (!loginBtn.dataset.originalText) {
+      loginBtn.dataset.originalText = loginBtn.textContent;
+    }
+    if (!registerBtn.dataset.originalText) {
+      registerBtn.dataset.originalText = registerBtn.textContent;
+    }
+    loginBtn.textContent = "處理中…";
+    registerBtn.textContent = "處理中…";
+  } else {
+    if (loginBtn.dataset.originalText) {
+      loginBtn.textContent = loginBtn.dataset.originalText;
+    }
+    if (registerBtn.dataset.originalText) {
+      registerBtn.textContent = registerBtn.dataset.originalText;
+    }
+  }
 }
 
 // 搜尋 / 篩選 / 排序
@@ -253,7 +304,7 @@ async function apiGetTasks() {
     renderTasks();
   } catch (err) {
     console.error(err);
-    alert("從後端取得作業失敗：" + err.message);
+    showMessage("app", "error", "從後端取得作業失敗：" + err.message);
   }
 }
 
@@ -316,9 +367,10 @@ async function handleToggleStatus(id) {
     const updated = await apiUpdateTask(id, { status: nextStatus });
     tasks = tasks.map(t => (t.id === id ? updated : t));
     renderTasks();
+    showMessage("app", "success", "已更新作業狀態。");
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    showMessage("app", "error", err.message);
   }
 }
 
@@ -331,9 +383,10 @@ async function handleDelete(id) {
     tasks = tasks.filter(t => t.id !== id);
     if (editingTaskId === id) resetForm();
     renderTasks();
+    showMessage("app", "success", "作業已刪除。");
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    showMessage("app", "error", err.message);
   }
 }
 
@@ -386,6 +439,7 @@ function refreshUIByAuth() {
     authSection.classList.add("hidden");
     appSection.classList.remove("hidden");
     currentUserLabel.textContent = `目前登入：${currentUser}`;
+    showMessage("auth", "", ""); // 清空登入訊息
     resetForm();
     apiGetTasks();
   } else {
@@ -403,9 +457,12 @@ async function handleRegister() {
   const password = passwordInput.value;
 
   if (!username || !password) {
-    alert("請輸入帳號與密碼！");
+    showMessage("auth", "error", "請輸入帳號與密碼！");
     return;
   }
+
+  showMessage("auth", "info", "註冊中，請稍候…");
+  setAuthLoading(true);
 
   try {
     const res = await fetch(`${API_BASE}/register`, {
@@ -417,10 +474,12 @@ async function handleRegister() {
     if (!res.ok) {
       throw new Error(data.error || "註冊失敗");
     }
-    alert("註冊成功，請重新登入。");
+    showMessage("auth", "success", "註冊成功，請重新登入。");
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    showMessage("auth", "error", err.message);
+  } finally {
+    setAuthLoading(false);
   }
 }
 
@@ -429,9 +488,12 @@ async function handleLogin() {
   const password = passwordInput.value;
 
   if (!username || !password) {
-    alert("請輸入帳號與密碼！");
+    showMessage("auth", "error", "請輸入帳號與密碼！");
     return;
   }
+
+  showMessage("auth", "info", "登入中，請稍候…");
+  setAuthLoading(true);
 
   try {
     const res = await fetch(`${API_BASE}/login`, {
@@ -448,10 +510,13 @@ async function handleLogin() {
     saveAuthToStorage();
     usernameInput.value = "";
     passwordInput.value = "";
+    showMessage("auth", "success", "登入成功，正在載入作業清單…");
     refreshUIByAuth();
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    showMessage("auth", "error", err.message);
+  } finally {
+    setAuthLoading(false);
   }
 }
 
@@ -460,6 +525,8 @@ function handleLogout() {
   if (!ok) return;
   clearAuth();
   resetForm();
+  showMessage("app", "", "");  // 清空 app 訊息
+  showMessage("auth", "", ""); // 清空登入訊息
   refreshUIByAuth();
 }
 
@@ -470,7 +537,7 @@ taskForm.addEventListener("submit", async event => {
   event.preventDefault();
 
   if (!currentUser || !authToken) {
-    alert("請先登入再新增作業！");
+    showMessage("auth", "error", "請先登入再新增作業！");
     return;
   }
 
@@ -480,7 +547,7 @@ taskForm.addEventListener("submit", async event => {
   const status = taskForm.status.value;
 
   if (!title || !course) {
-    alert("請填寫作業名稱與課程名稱！");
+    showMessage("app", "error", "請填寫作業名稱與課程名稱！");
     return;
   }
 
@@ -493,6 +560,7 @@ taskForm.addEventListener("submit", async event => {
         status
       });
       tasks = tasks.map(t => (t.id === editingTaskId ? updated : t));
+      showMessage("app", "success", "作業已更新。");
     } else {
       const created = await apiCreateTask({
         title,
@@ -501,12 +569,13 @@ taskForm.addEventListener("submit", async event => {
         status
       });
       tasks.push(created);
+      showMessage("app", "success", "已新增一筆作業。");
     }
     renderTasks();
     resetForm();
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    showMessage("app", "error", err.message);
   }
 });
 

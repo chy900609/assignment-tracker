@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>作業進度追蹤器</title>
+  <title>作業進度追蹤器 Plus（含登入系統）</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="app-header">
-    <h1>作業進度追蹤器</h1>
+    <h1>作業進度追蹤器 Plus</h1>
     <p class="subtitle">支援多帳號登入，作業資料存在後端 API</p>
   </header>
 
@@ -17,16 +17,20 @@
     <section class="card" id="auth-section">
       <h2>登入 / 註冊</h2>
       <p class="hint-text">
-        前端 + 後端 REST API 建立簡易登入功能。帳號與作業資料實際儲存在後端伺服器的記憶體中。
+        本系統示範透過前端 + 後端 REST API 建立簡易登入功能。帳號與作業資料實際儲存在後端伺服器的記憶體中（作業 Demo 用，未接資料庫）。
       </p>
+
+      <!-- 新增：登入 / 註冊訊息提示區 -->
+      <div id="auth-message" class="message hidden"></div>
+
       <form id="auth-form" class="auth-form">
         <div class="form-row">
           <label for="username">使用者帳號</label>
-          <input id="username" name="username" type="text" placeholder="" required>
+          <input id="username" name="username" type="text" placeholder="例如：b10609101" required>
         </div>
         <div class="form-row">
           <label for="password">密碼</label>
-          <input id="password" name="password" type="password" placeholder="" required>
+          <input id="password" name="password" type="password" placeholder="純作業示範用密碼" required>
         </div>
         <div class="form-actions">
           <button type="button" class="btn-primary" id="login-btn">登入</button>
@@ -46,17 +50,22 @@
         <button type="button" class="btn-secondary" id="logout-btn">登出</button>
       </section>
 
+      <!-- 新增：主系統的訊息提示（例如 CRUD 錯誤，可選用） -->
+      <section class="card">
+        <div id="app-message" class="message hidden"></div>
+      </section>
+
       <!-- 新增 / 編輯作業 -->
       <section class="card">
         <h2 id="form-title">新增作業</h2>
         <form id="task-form" class="task-form">
           <div class="form-row">
             <label for="title">作業名稱</label>
-            <input id="title" name="title" type="text" placeholder="例如：雲端運算期中" required>
+            <input id="title" name="title" type="text" placeholder="例如：可靠度工程作業 2" required>
           </div>
           <div class="form-row">
             <label for="course">課程名稱</label>
-            <input id="course" name="course" type="text" placeholder="例如：雲端運算" required>
+            <input id="course" name="course" type="text" placeholder="例如：可靠度工程 / 物聯網應用" required>
           </div>
           <div class="form-row">
             <label for="dueDate">截止日期</label>
