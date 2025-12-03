@@ -10,7 +10,7 @@ body {
 .app-header {
   padding: 24px 16px;
   text-align: center;
-  background: linear-gradient(135deg, #4b6cff, #7f5dff);
+  background: linear-gradient(135deg, #4b6cff, #7f5dff); /* 漸層 */
   color: #fff;
 }
 
@@ -25,7 +25,7 @@ body {
 }
 
 .app-main {
-  max-width: 960px;
+  max-width: 1080px;
   margin: 24px auto;
   padding: 0 16px 32px;
   display: flex;
@@ -37,7 +37,7 @@ body {
   background: #fff;
   border-radius: 12px;
   padding: 16px 20px;
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06); /* 陰影 */
 }
 
 .card h2 {
@@ -47,22 +47,63 @@ body {
 
 .card-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
-.filters select {
+.column-on-mobile {
+  flex-wrap: wrap;
+}
+
+/* 統計區 */
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+.stats span {
+  background: #f3f4ff;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* 控制列：搜尋 / 篩選 / 排序 */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+.control-group input,
+.control-group select {
   padding: 6px 8px;
   border-radius: 8px;
   border: 1px solid #d2d2dd;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  background: #fafafa;
 }
+
+/* 表單 */
 
 .task-form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px 16px;
 }
 
@@ -94,21 +135,45 @@ select:focus {
   box-shadow: 0 0 0 1px rgba(75, 108, 255, 0.3);
 }
 
-.btn-primary {
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 4px;
-  padding: 10px 16px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 9px 16px;
   border-radius: 999px;
   border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-primary {
   background: linear-gradient(135deg, #4b6cff, #7f5dff);
   color: #fff;
-  font-size: 0.95rem;
-  cursor: pointer;
-  justify-self: flex-start;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
+  opacity: 0.92;
 }
+
+.btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.btn-secondary:hover {
+  background: #d1d5db;
+}
+
+.hidden {
+  display: none;
+}
+
+/* 表格 */
 
 .table-wrapper {
   overflow-x: auto;
@@ -132,6 +197,18 @@ select:focus {
   font-weight: 600;
   color: #555;
 }
+
+/* 逾期列 */
+
+.row-overdue {
+  background: #fef2f2;
+}
+
+.row-overdue td {
+  border-bottom-color: #fecaca;
+}
+
+/* 狀態 badge */
 
 .status-badge {
   display: inline-flex;
@@ -157,6 +234,8 @@ select:focus {
   color: #166534;
 }
 
+/* 操作按鈕 */
+
 .btn-small {
   padding: 4px 8px;
   font-size: 0.75rem;
@@ -175,9 +254,28 @@ select:focus {
   gap: 6px;
 }
 
+/* footer */
+
 .app-footer {
   text-align: center;
   font-size: 0.8rem;
   color: #777;
   padding: 12px 0 24px;
+}
+
+/* RWD 調整 */
+
+@media (max-width: 640px) {
+  .card-header {
+    flex-direction: column;
+  }
+
+  .controls {
+    justify-content: flex-start;
+  }
+
+  .task-table th,
+  .task-table td {
+    padding: 6px 8px;
+  }
 }
